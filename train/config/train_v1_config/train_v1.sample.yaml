@@ -1,0 +1,15 @@
+train_data_dir: [
+  /home/chadrick/prj/kaggle/hubmap/data_prep/testoutput/slice_dataset/210310_210941
+]
+
+valid_data_dir: [
+
+]
+
+gpu: 0
+lr: 1.0e-3
+loss_type: focal_loss_gamma_3
+model_type: model_v1
+batch_size: 2
+
+epochs: 5

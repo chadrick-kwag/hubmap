@@ -4,3 +4,5 @@ data
 **/testinput
 **/testoutput
 .vscode
+**/config/**/*.yaml
+!**/config/**/*.sample.yaml

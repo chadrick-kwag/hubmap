@@ -39,21 +39,26 @@ class model_v1(torch.nn.Module):
         self.downblock_list=[]
         self.maxpool2d_list = []
 
-        for in_ch, out_ch in zip(level_in_ch_list, level_out_ch_list):
+        for idx, (in_ch, out_ch) in enumerate(zip(level_in_ch_list, level_out_ch_list)):
 
             b = block_v1(in_ch, out_ch)
+            setattr(self, f'downblock_{idx}', b)
 
             self.downblock_list.append(b)
-            self.maxpool2d_list.append(torch.nn.MaxPool2d(2))
+
+            maxpool = torch.nn.MaxPool2d(2)
+            setattr(self, f'maxpool2d_{idx}', maxpool)
+            self.maxpool2d_list.append(maxpool)
         
 
         high_level_in_ch = level_out_ch_list[-1]
         self.high_level_blocks = []
         
 
-        for _ in range(1):
-
-            self.high_level_blocks.append(block_v1(high_level_in_ch, high_level_in_ch))
+        for idx in range(1):
+            b = block_v1(high_level_in_ch, high_level_in_ch)
+            setattr(self, f'high_level_block_{idx}', b)
+            self.high_level_blocks.append(b)
 
         self.upblock_list =[]
 
@@ -82,13 +87,16 @@ class model_v1(torch.nn.Module):
 
         self.upsample_list = []
 
-        for upsample_in_ch, up_out_ch in zip(upsample_in_ch_list,up_out_ch_list):
+        for idx, (upsample_in_ch, up_out_ch) in enumerate(zip(upsample_in_ch_list,up_out_ch_list)):
             
             # print(f"upsample_in_ch: {upsample_in_ch}, up_out_ch: {up_out_ch}")
             b = block_v1(upsample_in_ch, up_out_ch)
-
+            setattr(self, f'upblock_{idx}', b)
             self.upblock_list.append(b)
-            self.upsample_list.append(torch.nn.Upsample(scale_factor=2))
+
+            u = torch.nn.Upsample(scale_factor=2)
+            setattr(self, f'upsample_{idx}', u)
+            self.upsample_list.append(u)
 
         # print(f'upblock size: {len(self.upblock_list)}')
 
@@ -127,10 +135,3 @@ class model_v1(torch.nn.Module):
         
         return y
 
-
-
-
-
-
-
-        
