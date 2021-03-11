@@ -47,11 +47,14 @@ else:
 
 """ setup dataloader """
 
+resize_w = config['dataset_resize_w']
+resize_h = config['dataset_resize_h']
+
 dataset_list = []
 
 for d in config['train_data_dir']:
     print(d)
-    ds = Dataset(d)
+    ds = Dataset(d, (resize_w, resize_h))
     dataset_list.append(ds)
 
 # print(f'dataset_list: {dataset_list}')
@@ -65,7 +68,7 @@ print(f'dataset len: {len(dataset)}')
 
 print(f'batch size: {config["batch_size"]}')
 
-dataloader = torch.utils.data.DataLoader(dataset, batch_size=4, shuffle=True, num_workers=0)
+dataloader = torch.utils.data.DataLoader(dataset, batch_size=config['batch_size'], shuffle=True, num_workers=0)
 
 print(len(dataloader))
 
@@ -73,7 +76,7 @@ print(len(dataloader))
 valid_dataset_list = []
 
 for d in config['valid_data_dir']:
-    ds = Dataset(d)
+    ds = Dataset(d, (resize_w, resize_h))
     valid_dataset_list.append(ds)
 
 if len(valid_dataset_list)==1:
@@ -81,7 +84,7 @@ if len(valid_dataset_list)==1:
 else:
     raise Exception()
 
-valid_dataloader = torch.utils.data.DataLoader(dataset, batch_size=4, num_workers=0)
+valid_dataloader = torch.utils.data.DataLoader(dataset, batch_size=config['batch_size'], num_workers=0)
 
 
 

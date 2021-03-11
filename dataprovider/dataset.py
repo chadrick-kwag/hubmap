@@ -4,9 +4,12 @@ from data_prep.Datapair import get_dplist_from_dir
 
 class Dataset(torch.utils.data.Dataset):
 
-    def __init__(self, datadir):
+    def __init__(self, datadir, resize):
 
         self.datadir = datadir
+        resize_w, resize_h = resize
+        self.resize_w = resize_w
+        self.resize_h = resize_h
 
         imgdir = os.path.join(datadir, 'images')
         annotdir = os.path.join(datadir, 'annots')
@@ -18,6 +21,8 @@ class Dataset(torch.utils.data.Dataset):
 
         assert len(self.dplist) > 0
 
+
+
     def __len__(self):
         return len(self.dplist)
 
@@ -27,6 +32,9 @@ class Dataset(torch.utils.data.Dataset):
 
         img = cv2.imread(dp.imgpath)
         mask = cv2.imread(dp.annotpath)
+
+        img = cv2.resize(img, (self.resize_w, self.resize_h))
+        mask = cv2.resize(img, (self.resize_w, self.resize_h))
 
         mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
         mask = np.expand_dims(mask, -1)

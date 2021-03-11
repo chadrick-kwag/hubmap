@@ -3,13 +3,23 @@ train_data_dir: [
 ]
 
 valid_data_dir: [
-
+  /home/chadrick/prj/kaggle/hubmap/testinput/validset/210311_0
 ]
+
+
+ckpt: null
+
 
 gpu: 0
 lr: 1.0e-3
 loss_type: focal_loss_gamma_3
 model_type: model_v1
-batch_size: 2
+batch_size: 32
+
+
+dataset_resize_w: 256
+dataset_resize_h: 256
 
 epochs: 5
+manual_save_period: 100
+run_valid_period: 20
