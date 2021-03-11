@@ -5,20 +5,29 @@ import torch
 
 class block_v1(torch.nn.Module):
 
-    def __init__(self, in_ch, out_ch) -> None:
+    def __init__(self, in_ch, out_ch, last_act='relu') -> None:
         super().__init__()
 
         self.conv1 = torch.nn.Conv2d(in_ch, out_ch, kernel_size=3, padding=1, bias=False)
         self.instnorm1 = torch.nn.InstanceNorm2d(out_ch)
         self.conv2 = torch.nn.Conv2d(out_ch, out_ch, kernel_size=3, padding=1, bias=False)
         self.instnomr2 = torch.nn.InstanceNorm2d(out_ch)
+
+        self.last_act = last_act
         
 
     def forward(self, x):
 
         y = torch.relu(self.instnorm1(self.conv1(x)))
 
-        y = torch.relu(self.instnomr2(self.conv2(y)))
+        y = self.instnomr2(self.conv2(y))
+
+        if self.last_act == 'relu':
+            y = torch.relu(y)
+        elif self.last_act == 'sigmoid':
+            y = torch.sigmoid(y)
+        else:
+            raise Exception(f'invalid last act: {self.last_act}')
 
         return y
 
@@ -101,7 +110,7 @@ class model_v1(torch.nn.Module):
         # print(f'upblock size: {len(self.upblock_list)}')
 
 
-        self.last_block = block_v1(3,1)
+        self.last_block = block_v1(3,1, last_act='sigmoid')
 
     def forward(self, x):
 
@@ -132,6 +141,7 @@ class model_v1(torch.nn.Module):
             y = self.upblock_list[i](upsampled_y + skip_tensor)
 
         y = self.last_block(y)
+
+        y = y.permute(0,2,3,1)
         
         return y
-

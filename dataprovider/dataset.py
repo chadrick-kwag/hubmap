@@ -1,4 +1,4 @@
-import torch, os, cv2
+import torch, os, cv2, numpy as np
 from data_prep.Datapair import get_dplist_from_dir
 
 
@@ -27,5 +27,16 @@ class Dataset(torch.utils.data.Dataset):
 
         img = cv2.imread(dp.imgpath)
         mask = cv2.imread(dp.annotpath)
+
+        mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
+        mask = np.expand_dims(mask, -1)
+
+        mask = mask / 255
+        mask = mask > 0.5
+        mask = mask.astype(float)
+
+        # normalize img by /255
+
+        img = img/255
 
         return img, mask

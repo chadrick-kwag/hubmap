@@ -17,8 +17,12 @@ def manual_bce_loss(pred_tensor, gt_tensor, epsilon = 1e-8):
 
 
 def manual_focal_loss(pred_tensor, gt_tensor, gamma, epsilon = 1e-8):
+
+    # print(f'pred tensor: {pred_tensor.shape}, gt_tensor: {gt_tensor.shape}')
+
     a = logit_sanitation(1-pred_tensor, epsilon)
     b = logit_sanitation(pred_tensor, epsilon)
+
     logit = (1-gt_tensor) * a + gt_tensor * b
     focal_loss = - (1-logit) ** gamma * torch.log(logit)
     return focal_loss
@@ -29,4 +33,8 @@ def focal_loss_on_cpu(pred_tensor, gt_tensor, gamma, epsilon = 1e-8):
     pred_tensor = pred_tensor.cpu()
     gt_tensor = gt_tensor.cpu()
 
-    return manual_focal_loss(pred_tensor, gt_tensor, gamma=gamma, epsilon=epsilon)
+    loss =  manual_focal_loss(pred_tensor, gt_tensor, gamma=gamma, epsilon=epsilon)
+
+    # print(f'loss shp: {loss.shape}')
+
+    return loss.mean()
