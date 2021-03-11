@@ -134,7 +134,7 @@ os.makedirs(savedir)
 dice_save_callback = MonitorCkptSaveCallback(net, savedir, 'max', 'dice')
 
 
-valid_callback = ValidationCallback(net, valid_dataloader, device, dice_subscribers=[dice_save_callback])
+valid_callback = ValidationCallback(net, valid_dataloader, device, dice_subscribers=[dice_save_callback], writer=writer)
 
 
 

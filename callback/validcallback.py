@@ -3,7 +3,7 @@ import torch, numpy as np
 
 class ValidationCallback:
 
-    def __init__(self, net, dataloader, device, threshold=0.5, dice_subscribers = []) -> None:
+    def __init__(self, net, dataloader, device, threshold=0.5, dice_subscribers = [], writer=None) -> None:
 
         self.net = net
         self.dataloader = dataloader
@@ -11,8 +11,10 @@ class ValidationCallback:
         self.threshold = threshold
 
         self.dice_subscribers = dice_subscribers
+
+        self.writer = writer
     
-    def run(self, epoch, step, global_step, writer=None):
+    def run(self, epoch, step, global_step):
 
 
         dice_list = []
@@ -72,5 +74,8 @@ class ValidationCallback:
 
         for a in self.dice_subscribers:
             a.run(epoch, step, global_step, mean_dice)
+
+        if self.writer is not None:
+            self.writer.add_scalar('valid/mean_dice', mean_dice, global_step)
 
         
