@@ -19,6 +19,7 @@ class MonitorCkptSaveCallback:
 
     def run(self, epoch, step, global_step, val):
 
+
         savepath = os.path.join(self.savedir, f'{self.metric_name}_{val}_epoch={epoch}_step={step}.pt')
 
         new_item = (val, savepath)
@@ -34,13 +35,19 @@ class MonitorCkptSaveCallback:
 
         new_save_list.sort(key=lambda x: x[0], reverse=reverse_flag)
 
+        eliminate_item = None
         if len(new_save_list) > self.keep_size:
             eliminate_item = new_save_list[self.keep_size]
         
-            os.remove(eliminate_item[1])
-        
+            if os.path.exists(eliminate_item[1]):
+                os.remove(eliminate_item[1])
 
-        torch.save(self.net.state_dict(), savepath)
+            new_save_list = new_save_list[:self.keep_size]
+
+        self.save_list = new_save_list
+        
+        if new_item!=eliminate_item:
+            torch.save(self.net.state_dict(), savepath)
 
 
 

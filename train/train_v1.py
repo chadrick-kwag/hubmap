@@ -101,6 +101,15 @@ if model_builder is None:
 
 
 net = model_builder(3)
+
+### load ckpt if exists
+if config['ckpt'] is not None:
+    assert os.path.exists(config['ckpt']), 'ckpt not exist'
+
+    print(f'>> loading ckpt from : {config["ckpt"]}')
+
+    net.load_state_dict(torch.load(config['ckpt']))
+
 net = net.to(device)
 
 
@@ -135,9 +144,6 @@ dice_save_callback = MonitorCkptSaveCallback(net, savedir, 'max', 'dice')
 
 
 valid_callback = ValidationCallback(net, valid_dataloader, device, dice_subscribers=[dice_save_callback], writer=writer)
-
-
-
 
 
 ### setup train iter option
