@@ -17,8 +17,10 @@ model_type: model_v1
 batch_size: 32
 
 
-dataset_resize_w: 256
-dataset_resize_h: 256
+dataset_resize_w: 128
+dataset_resize_h: 128
+
+suffix: model_v1_focal_loss_gamma_3
 
 epochs: 5
 manual_save_period: 100

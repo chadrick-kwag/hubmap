@@ -24,8 +24,10 @@ with open(args.config, 'r') as fd:
 
 """ setup savedir """
 
+suffix = config['suffix']
+
 timestamp=datetime.datetime.now().strftime("%y%m%d_%H%M%S")
-outputdir = f'ckpt/train_v1/{timestamp}'
+outputdir = f'ckpt/train_v1/{timestamp}_{suffix}'
 
 os.makedirs(outputdir)
 

@@ -7,3 +7,4 @@ data
 **/config/**/*.yaml
 !**/config/**/*.sample.yaml
 **/ckpt
+**/*.sh

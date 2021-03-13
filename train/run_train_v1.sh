@@ -1,1 +1,0 @@
-python train_v1.py /home/chadrick/prj/kaggle/hubmap/train/config/train_v1_config/test.yaml
