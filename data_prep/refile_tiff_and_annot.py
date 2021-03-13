@@ -1,8 +1,8 @@
-import os, glob, datetime, shutil
+import os, glob, datetime, shutil, json
 
 
 
-data_dir = '/home/chadrick/prj/kaggle/hubmap/data/train'
+data_dir = '/home/chadrick/prj/kaggle/hubmap/data/new/test'
 
 
 tiff_files = glob.glob(os.path.join(data_dir, '*.tiff'))
@@ -15,13 +15,13 @@ for f in tiff_files:
     fn, _ = os.path.splitext(bn)
 
     
-    jsonfile = os.path.join(data_dir, f'{fn}.json')
+    # jsonfile = os.path.join(data_dir, f'{fn}.json')
     structure_file = os.path.join(data_dir, f'{fn}-anatomical-structure.json')
 
-    assert os.path.exists(jsonfile)
+    # assert os.path.exists(jsonfile)
     assert os.path.exists(structure_file)
 
-    tuple_list.append([f, jsonfile, structure_file])
+    tuple_list.append([f, None, structure_file])
 
 
 print(len(tuple_list))
@@ -50,10 +50,10 @@ for a,b,c in tuple_list:
     shutil.copy2(a, savepath)
 
 
-    bn = os.path.basename(b)
+    # bn = os.path.basename(b)
 
-    savepath = os.path.join(saveannotdir, bn)
-    shutil.copy2(b, savepath)
+    # savepath = os.path.join(saveannotdir, bn)
+    # shutil.copy2(b, savepath)
 
 
     bn = os.path.basename(c)
@@ -62,3 +62,11 @@ for a,b,c in tuple_list:
     shutil.copy2(c, savepath)
 
 
+savejson = {
+    'data_dir': data_dir
+}
+
+savepath = os.path.join(outputdir, 'info.json')
+
+with open(savepath, 'w') as fd:
+    json.dump(savejson, fd, indent=4, ensure_ascii= False)

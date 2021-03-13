@@ -4,7 +4,7 @@ from Datapair import get_dplist_from_dir
 from tqdm import tqdm
 
 
-data_dir = '/home/chadrick/prj/kaggle/hubmap/data_prep/testoutput/refile_tiff_and_annot/210309_235006'
+data_dir = '/home/chadrick/prj/kaggle/hubmap/data_prep/testoutput/refile_tiff_and_annot/210313_113841'
 
 
 imgdir = os.path.join(data_dir, 'images')
@@ -15,155 +15,167 @@ dplist = get_dplist_from_dir(imgdir, annotdir)
 dp = dplist[0]
 
 
+for dp in dplist:
 
+    try:
 
-img = tiff.imread(dp.imgpath)
+        print(f'working on {dp.imgpath}')
 
-if len(img.shape)==5:
-    img = img[0,0,:]
-    img = np.transpose(img, (1,2,0))    
-elif len(img.shape)==3: 
-    pass
-else:
-    raise Exception(f'invalid img shape: {img.shape}')
+        img = tiff.imread(dp.imgpath)
 
+        if len(img.shape)==5:
+            img = img[0,0,:]
+            img = np.transpose(img, (1,2,0))    
+        elif len(img.shape)==3: 
+            pass
+        else:
+            raise Exception(f'invalid img shape: {img.shape}')
 
-img = tiff.imread(dp.imgpath)
 
-if len(img.shape)==5:
-    img = img[0,0,:]
-    img = np.transpose(img, (1,2,0))    
-elif len(img.shape)==3: 
-    pass
-else:
-    raise Exception(f'invalid img shape: {img.shape}')
+        img = tiff.imread(dp.imgpath)
 
+        print(f'raw img shp: {img.shape}')
 
-img_h = img.shape[0]
-img_w = img.shape[1]
+        if len(img.shape)==5:
+            img = img[0,0,:]
+            img = np.transpose(img, (1,2,0))    
+        elif len(img.shape)==3: 
+            img = np.transpose(img, (1,2,0))
+            pass
+        else:
+            raise Exception(f'invalid img shape: {img.shape}')
 
+        print(f'img shp: {img.shape}')
 
-with open(dp.annotpath, 'r') as fd:
-    readjson = json.load(fd)
+        img_h = img.shape[0]
+        img_w = img.shape[1]
 
 
-poly_list = []
+        with open(dp.annotpath, 'r') as fd:
+            readjson = json.load(fd)
 
-for elem in readjson:
 
-    poly = elem['geometry']['coordinates'][0]
+        poly_list = []
 
-    poly_list.append(poly)
+        for elem in readjson:
 
-print(len(poly_list))
+            poly = elem['geometry']['coordinates'][0]
 
+            poly_list.append(poly)
 
-slice_w = 800
-slice_h = 800
+        print(len(poly_list))
 
-mask = np.zeros((img_h, img_w), dtype='uint8')
 
-print(f'mask shape: {mask.shape}')
+        slice_w = 800
+        slice_h = 800
 
-# poly_arr = np.array(poly_list)
+        mask = np.zeros((img_h, img_w), dtype='uint8')
 
-# print(f'poly_arr shp: {poly_arr.shape}')
+        print(f'mask shape: {mask.shape}')
 
+        # poly_arr = np.array(poly_list)
 
-for poly in poly_list:
-    poly_arr = np.array(poly)
-    print(f'poly_arr shp: {poly_arr.shape}')
-    cv2.fillPoly(mask, [poly_arr], 255)
+        # print(f'poly_arr shp: {poly_arr.shape}')
 
 
-print(f'mask unique values: {np.unique(mask)}')
-mask_sum = np.sum(mask)
+        for poly in poly_list:
+            poly_arr = np.array(poly)
+            poly_arr = poly_arr.astype(int)
+            # print(f'poly_arr shp: {poly_arr.shape}')
+            # print(poly_arr)
+            cv2.fillPoly(mask, [poly_arr], 255)
 
-print(f"mask sum: {mask_sum}")
 
+        print(f'mask unique values: {np.unique(mask)}')
+        mask_sum = np.sum(mask)
 
-timestamp=datetime.datetime.now().strftime("%y%m%d_%H%M%S")
-outputdir = f'testoutput/slice_dataset/{timestamp}'
-os.makedirs(outputdir)
+        print(f"mask sum: {mask_sum}")
 
-savepath = os.path.join(outputdir, 'mask.png')
 
-cv2.imwrite(savepath, mask)
+        timestamp=datetime.datetime.now().strftime("%y%m%d_%H%M%S")
+        outputdir = f'testoutput/slice_dataset/{timestamp}'
+        os.makedirs(outputdir)
 
+        savepath = os.path.join(outputdir, 'mask.png')
 
-saveimgdir = os.path.join(outputdir, 'images')
-saveannotdir = os.path.join(outputdir, 'annots')
+        cv2.imwrite(savepath, mask)
 
-os.makedirs(saveimgdir)
-os.makedirs(saveannotdir)
 
+        saveimgdir = os.path.join(outputdir, 'images')
+        saveannotdir = os.path.join(outputdir, 'annots')
 
-slice_x_start_list=[]
-slice_x_end_list = []
+        os.makedirs(saveimgdir)
+        os.makedirs(saveannotdir)
 
 
-slice_w_num = img_w// slice_w
+        slice_x_start_list=[]
+        slice_x_end_list = []
 
 
-for i in range(slice_w_num):
+        slice_w_num = img_w// slice_w
 
-    slice_x_start = slice_w * i
-    slice_x_end = slice_w * (i+1)
 
-    if slice_x_end > img_w:
-        slice_x_end = img_w
-        slice_x_start = slice_x_end - slice_w
+        for i in range(slice_w_num):
 
-    slice_x_start_list.append(slice_x_start)
-    slice_x_end_list.append(slice_x_end)
+            slice_x_start = slice_w * i
+            slice_x_end = slice_w * (i+1)
 
+            if slice_x_end > img_w:
+                slice_x_end = img_w
+                slice_x_start = slice_x_end - slice_w
 
-slice_y_start_list = []
-slice_y_end_list = []
+            slice_x_start_list.append(slice_x_start)
+            slice_x_end_list.append(slice_x_end)
 
-slice_h_num = img_h // slice_h
 
-for i in range(slice_h_num):
+        slice_y_start_list = []
+        slice_y_end_list = []
 
-    slice_y_start = slice_h * i
-    slice_y_end = slice_h * (i+1)
+        slice_h_num = img_h // slice_h
 
-    if slice_y_end > img_h:
-        slice_y_end = img_h
-        slice_y_start = slice_y_end - slice_h
-    
-    slice_y_start_list.append(slice_y_start)
-    slice_y_end_list.append(slice_y_end)
+        for i in range(slice_h_num):
 
+            slice_y_start = slice_h * i
+            slice_y_end = slice_h * (i+1)
 
-print(f'slice w num: {slice_w_num}, slice h num: {slice_h_num}')
+            if slice_y_end > img_h:
+                slice_y_end = img_h
+                slice_y_start = slice_y_end - slice_h
+            
+            slice_y_start_list.append(slice_y_start)
+            slice_y_end_list.append(slice_y_end)
 
 
-gen_count = 0
+        print(f'slice w num: {slice_w_num}, slice h num: {slice_h_num}')
 
-progress = tqdm(total=len(slice_x_start_list) * len(slice_y_start_list))
 
-for slice_x_start, slice_x_end in zip(slice_x_start_list, slice_x_end_list):
+        gen_count = 0
 
-    for slice_y_start, slice_y_end in zip(slice_y_start_list, slice_y_end_list):
+        progress = tqdm(total=len(slice_x_start_list) * len(slice_y_start_list))
 
-        img_crop = img[slice_y_start: slice_y_end, slice_x_start:slice_x_end]
+        for slice_x_start, slice_x_end in zip(slice_x_start_list, slice_x_end_list):
 
-        mask_crop = mask[slice_y_start: slice_y_end, slice_x_start: slice_x_end]
-    
+            for slice_y_start, slice_y_end in zip(slice_y_start_list, slice_y_end_list):
 
-        savepath = os.path.join(saveimgdir, f'{gen_count}.png')
-        cv2.imwrite(savepath, img_crop)
+                img_crop = img[slice_y_start: slice_y_end, slice_x_start:slice_x_end]
 
+                mask_crop = mask[slice_y_start: slice_y_end, slice_x_start: slice_x_end]
+            
 
-        savepath = os.path.join(saveannotdir, f'{gen_count}.png')
-        cv2.imwrite(savepath, mask_crop)
+                savepath = os.path.join(saveimgdir, f'{gen_count}.png')
+                cv2.imwrite(savepath, img_crop)
 
-        gen_count +=1
 
-        progress.update(1)
-    
+                savepath = os.path.join(saveannotdir, f'{gen_count}.png')
+                cv2.imwrite(savepath, mask_crop)
 
+                gen_count +=1
 
+                progress.update(1)
+            
+
+    except Exception as e:
+        print(f'error on {dp.imgpath}')
+        raise e
 
 
