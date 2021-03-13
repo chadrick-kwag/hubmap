@@ -1,4 +1,4 @@
-import argparse, os, sys, torch, tqdm, yaml, datetime, shutil
+import argparse, os, sys, torch, tqdm, yaml, datetime, shutil, numpy as np
 from torch import optim
 from torch.utils.tensorboard import SummaryWriter
 
@@ -10,6 +10,7 @@ from loss.loss_map import loss_map
 from callback.manualsavecallback import ManualSaveCallback
 from callback.validcallback import ValidationCallback
 from callback.monitor_metric_ckptsave_callback import MonitorCkptSaveCallback
+from dataprovider.dataloader import WeightedSamplingDataloader
 
 parser = argparse.ArgumentParser()
 
@@ -53,24 +54,19 @@ resize_w = config['dataset_resize_w']
 resize_h = config['dataset_resize_h']
 
 dataset_list = []
+weight_list = []
 
-for d in config['train_data_dir']:
-    print(d)
+for d, weight in config['train_data_dir']:
+    # print(d)
     ds = Dataset(d, (resize_w, resize_h))
     dataset_list.append(ds)
+    weight_list.append(weight)
 
-# print(f'dataset_list: {dataset_list}')
-
-if len(dataset_list)==1:
-    dataset = dataset_list[0]
-else:
-    raise Exception('multiple datasets')
-
-print(f'dataset len: {len(dataset)}')
 
 print(f'batch size: {config["batch_size"]}')
 
-dataloader = torch.utils.data.DataLoader(dataset, batch_size=config['batch_size'], shuffle=True, num_workers=0)
+# dataloader = torch.utils.data.DataLoader(dataset, batch_size=config['batch_size'], shuffle=True, num_workers=0)
+dataloader = WeightedSamplingDataloader(dataset_list, weight_list, config["batch_size"])
 
 print(len(dataloader))
 
@@ -176,9 +172,12 @@ for epoch_i in range(epochs):
 
         # print(batch_data)
 
+        batch_mask_data = torch.FloatTensor(batch_mask_data)
 
 
-        batch_img_data = batch_img_data.float().to(device)
+
+
+        batch_img_data = torch.FloatTensor(batch_img_data).to(device)
 
         batch_img_data = batch_img_data.permute(0,3,1,2)
 
@@ -212,5 +211,3 @@ for epoch_i in range(epochs):
 
             valid_callback.run(epoch_i, step, global_step)
 
-
-       
