@@ -45,15 +45,15 @@ class ValidationCallback:
 
             batch_mask_data = batch_mask_data.numpy()
 
-            _dice_list = batch_dice(pred_mask, batch_mask_data)
+            _dice_list = batch_dice(~pred_mask, ~batch_mask_data)
             dice_list.extend(_dice_list)
 
         mean_dice = sum(dice_list) / len(dice_list)
 
-        print(f'mean_dice: {mean_dice}')
+        print(f'mean bg_dice: {mean_dice}')
 
         for a in self.dice_subscribers:
             a.run(epoch, step, global_step, mean_dice)
 
         if self.writer is not None:
-            self.writer.add_scalar('valid/mean_dice', mean_dice, global_step)
+            self.writer.add_scalar('valid/mean_bg_dice', mean_dice, global_step)

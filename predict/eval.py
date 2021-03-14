@@ -1,4 +1,4 @@
-import torch, yaml, os, datetime, argparse, sys, glob, cv2, json, numpy as np
+import torch, yaml, os, datetime, argparse, sys, glob, cv2, json, numpy as np, shutil
 from tqdm import tqdm
 
 sys.path.append(os.path.abspath(".."))
@@ -71,6 +71,14 @@ def main(config):
 
     os.makedirs(outputdir)
 
+
+    # copy used config
+
+    savepath = os.path.join(outputdir, 'usedconfig.yaml')
+
+    with open(savepath, 'w') as fd:
+        yaml.dump(config, fd)
+
     threshold = config['threshold']
 
 
@@ -106,7 +114,7 @@ def main(config):
 
         maskimg = pred_mask.astype('uint8') * 255
 
-        dice_list = batch_dice(pred_mask, mask_nparr)
+        dice_list = batch_dice(~pred_mask, ~mask_nparr)
 
         for i,(m, gt_m, d, orig_img) in enumerate(zip(maskimg, mask_nparr, dice_list, orig_img_nparr)):
 
@@ -130,7 +138,7 @@ def main(config):
 
     mean_dice = sum(dice_list) / len(dice_list)
 
-    print(f'mean_dice: {mean_dice}')
+    print(f'bg mean_dice: {mean_dice}')
 
     savejson = {
         'mean_dice': mean_dice,
@@ -142,7 +150,7 @@ def main(config):
     with open(savepath, 'w') as fd:
         json.dump(savejson, fd, indent=4, ensure_ascii=False)
 
-    return savejson
+    return savejson, os.path.abspath(outputdir)
 
 
 if __name__ == '__main__':
