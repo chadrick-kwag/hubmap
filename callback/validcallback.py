@@ -1,4 +1,5 @@
 import torch, numpy as np
+from criterion.dice import batch_dice
 
 
 class ValidationCallback:
@@ -44,29 +45,8 @@ class ValidationCallback:
 
             batch_mask_data = batch_mask_data.numpy()
 
-            # print(f'batch_mask_data: {batch_mask_data.shape}')
-            # print(f'batch_mask_data dtype: {batch_mask_data.dtype}')
-
-
-            and_mask = batch_mask_data * pred_mask
-
-            delimiter = batch_mask_data + pred_mask
-            delimiter = delimiter.astype(bool)
-
-            and_mask_flat = np.reshape(and_mask, [and_mask.shape[0], -1])
-            delimiter_flat = np.reshape(delimiter, [delimiter.shape[0], -1])
-
-            and_mask_sum_arr = np.sum(and_mask_flat, axis=1)
-            delimiter_sum_arr = np.sum(delimiter_flat, axis=1)
-            delimiter_sum_arr = delimiter_sum_arr.astype(float) + 1e-8 # avoid divide by zero
-
-            # print(f'and_mask_sum_arr: {and_mask_sum_arr}, delimiter_sum_arr: {delimiter_sum_arr}')
-
-            dice_arr = and_mask_sum_arr / delimiter_sum_arr
-
-            dice_list.extend(dice_arr.tolist())
-
-        # print(f'dice_list: {dice_list}')
+            _dice_list = batch_dice(pred_mask, batch_mask_data)
+            dice_list.extend(_dice_list)
 
         mean_dice = sum(dice_list) / len(dice_list)
 
@@ -77,5 +57,3 @@ class ValidationCallback:
 
         if self.writer is not None:
             self.writer.add_scalar('valid/mean_dice', mean_dice, global_step)
-
-        
