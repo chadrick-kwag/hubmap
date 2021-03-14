@@ -39,3 +39,19 @@ def focal_loss_on_cpu(pred_tensor, gt_tensor, gamma, epsilon = 1e-8):
     # print(f'loss shp: {loss.shape}')
 
     return loss.mean()
+
+
+def dice_loss(pred_tensor, gt_tensor, epsilon=1e-8):
+
+    pred_tensor = pred_tensor.cpu()
+    gt_tensor = gt_tensor.cpu()
+
+    # pred_flat = pred_tensor.view(-1)
+    # gt_flat = gt_tensor.view(-1)
+
+    intersection = pred_tensor * gt_tensor
+
+    dice = 1-(2 * intersection.sum() ) / (pred_tensor.sum() + gt_tensor.sum() + epsilon)
+
+    return dice
+

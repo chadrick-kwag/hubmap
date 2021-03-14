@@ -30,6 +30,7 @@ class EfficientUnetb0(torch.nn.Module):
 
     def forward(self, x):
         y = self.base(x)
+        y = torch.sigmoid(y)
         y = y.permute(0,2,3,1)
 
         return y
@@ -45,6 +46,7 @@ class EfficientUnetb1(torch.nn.Module):
 
     def forward(self, x):
         y = self.base(x)
+        y = torch.sigmoid(y)
         y = y.permute(0,2,3,1)
 
         return y
@@ -60,6 +62,7 @@ class EfficientUnetb2(torch.nn.Module):
 
     def forward(self, x):
         y = self.base(x)
+        y = torch.sigmoid(y)
         y = y.permute(0,2,3,1)
 
         return y

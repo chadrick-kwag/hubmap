@@ -118,6 +118,15 @@ net = net.to(device)
 
 optimizer = torch.optim.Adam(net.parameters(),lr=config['lr'])
 
+""" setup scheduler """
+
+scheduler_type = config['scheduler_type']
+
+if scheduler_type == 'mslr':
+    scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=config['scheduler_options']['mslr_milestone'], gamma=config['scheduler_options']['mslr_gamma'])
+elif scheduler_type == 'CosineAnnealingWarmRestarts':
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=config['scheduler_options']['t0'])
+
 """ setup loss fn """
 
 loss_type = config['loss_type']
@@ -200,6 +209,7 @@ for epoch_i in range(epochs):
         loss.backward()
 
         optimizer.step()
+        
 
         
 
@@ -210,4 +220,6 @@ for epoch_i in range(epochs):
         if global_step % run_valid_period == 0:
 
             valid_callback.run(epoch_i, step, global_step)
+    
+    scheduler.step()
 
