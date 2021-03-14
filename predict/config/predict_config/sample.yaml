@@ -1,0 +1,12 @@
+ckpt: /home/chadrick/prj/kaggle/hubmap/train/ckpt/train_v1/210314_000201_model_v1_focal_loss_gamma_3/customsave/dice_0.7387885198244207_epoch=7_step=652.pt
+
+
+
+
+gpu: 0
+model_type: model_v1
+resize_w: 256
+resize_h: 256
+batch_size: 4
+
+target: /home/chadrick/prj/kaggle/hubmap/data_prep/testoutput/split_trainval_from_coverage_split/210313_171723/valid/images

@@ -5,6 +5,6 @@ data
 **/testoutput
 .vscode
 **/config/**/*.yaml
-!**/config/**/*.sample.yaml
+!**/config/**/*sample.yaml
 **/ckpt
 **/*.sh
