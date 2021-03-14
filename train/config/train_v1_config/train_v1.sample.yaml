@@ -1,9 +1,16 @@
 train_data_dir: [
-  /home/chadrick/prj/kaggle/hubmap/data_prep/testoutput/slice_dataset/210310_210941
+  [/home/chadrick/prj/kaggle/hubmap/data_prep/testoutput/split_trainval_from_coverage_split/210313_171723/train/0.0-0.05169578, 1],
+  [/home/chadrick/prj/kaggle/hubmap/data_prep/testoutput/split_trainval_from_coverage_split/210313_171723/train/0.05169578-0.10339156, 1],
+  [/home/chadrick/prj/kaggle/hubmap/data_prep/testoutput/split_trainval_from_coverage_split/210313_171723/train/0.10339156-0.15508734, 1],
+  [/home/chadrick/prj/kaggle/hubmap/data_prep/testoutput/split_trainval_from_coverage_split/210313_171723/train/0.15508734-0.20678312, 1],
+  [/home/chadrick/prj/kaggle/hubmap/data_prep/testoutput/split_trainval_from_coverage_split/210313_171723/train/0.20678312-0.25847891,1],
+  [/home/chadrick/prj/kaggle/hubmap/data_prep/testoutput/split_trainval_from_coverage_split/210313_171723/train/0.25847891-1,1]
 ]
+# item of train_data_dir: [path, weight]
 
 valid_data_dir: [
-  /home/chadrick/prj/kaggle/hubmap/testinput/validset/210311_0
+  /home/chadrick/prj/kaggle/hubmap/data_prep/testoutput/split_trainval_from_coverage_split/210313_171723/valid
+
 ]
 
 
@@ -12,15 +19,27 @@ ckpt: null
 
 gpu: 0
 lr: 1.0e-3
-loss_type: focal_loss_gamma_3
-model_type: model_v1
-batch_size: 32
+
+loss_type: dice_loss
+model_type: EfficientUnetb2
+batch_size: 8
+
+# scheduler_type: mslr
+# scheduler_options:
+#   mslr_milestone: [5,10]
+#   mslr_gamma: 0.1
+
+scheduler_type:  CosineAnnealingWarmRestarts
+scheduler_options:
+  t0: 1
+
+
+suffix: test
 
 
 dataset_resize_w: 128
 dataset_resize_h: 128
 
-
-epochs: 5
+epochs: 10000
 manual_save_period: 100
-run_valid_period: 20
+run_valid_period: 10
