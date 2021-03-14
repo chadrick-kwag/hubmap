@@ -46,3 +46,8 @@ this will save outputs including overlayed images and save dice values.
 
 data preparation scripts are under `data_prep/`. these scripts are mainly slicing raw data, splitting, restructuring dataset structure, etc.
 
+## Pretrained model
+
+a pretrained model and trained config file is zipped and available [here](https://drive.google.com/file/d/1InGfwLFKHZkonmsd9yltm6D-kIs5NPDW/view?usp=sharing)
+
+when using this for prediction, please adjust prediction config appropriately to match pretrained model's config, such as `resize_w` and `resize_h`.
