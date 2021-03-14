@@ -30,6 +30,7 @@ def manual_focal_loss(pred_tensor, gt_tensor, gamma, epsilon = 1e-8):
 
 def focal_loss_on_cpu(pred_tensor, gt_tensor, gamma, epsilon = 1e-8):
 
+
     pred_tensor = pred_tensor.cpu()
     gt_tensor = gt_tensor.cpu()
 

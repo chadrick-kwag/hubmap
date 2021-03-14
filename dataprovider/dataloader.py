@@ -25,7 +25,18 @@ class WeightedSamplingDataloader:
         self.total_data_size = total_data_size
         self.dataset_index_list = list(range(len(dataset_list)))
 
+    def reset_dataset_iter_list(self):
+
+        self.dataset_iter_list = []
+
+        for d in self.dataset_list:
+            
+
+            self.dataset_iter_list.append(iter(d))
+
+
     def __iter__(self):
+        self.reset_dataset_iter_list()
         self.num = 0
         return self
 
@@ -46,7 +57,10 @@ class WeightedSamplingDataloader:
         fetch_list = []
 
         for i in dataset_index_list:
-            a = self.dataset_iter_list[i].next()
+            it = self.dataset_iter_list[i]
+            # print(it)
+            a = next(it)
+            # a = it.next()
             fetch_list.append(a)
         
         if isinstance(fetch_list[0], tuple):
